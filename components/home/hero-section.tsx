@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Home, MapPin, DollarSign, Bed, ChevronDown } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Search, Home, MapPin, ChevronDown, Building2, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import {
@@ -24,15 +24,29 @@ const propertyTypes = [
   { value: 'casa', label: 'Casa' },
   { value: 'departamento', label: 'Departamento' },
   { value: 'ph', label: 'PH' },
-  { value: 'lote', label: 'Lote' },
+  { value: 'lote', label: 'Lote / Terreno' },
   { value: 'oficina', label: 'Oficina' },
+  { value: 'local', label: 'Local Comercial' },
 ]
 
 const locations = [
   { value: 'todos', label: 'Todas las zonas' },
   { value: 'el-palomar', label: 'El Palomar' },
   { value: 'ciudad-jardin', label: 'Ciudad Jardín' },
+  { value: 'caseros', label: 'Caseros' },
+  { value: 'saenz-pena', label: 'Sáenz Peña' },
+  { value: 'haedo', label: 'Haedo' },
+  { value: 'moron', label: 'Morón' },
   { value: 'zona-oeste', label: 'Zona Oeste' },
+]
+
+const priceRanges = [
+  { value: 'todos', label: 'Cualquier precio' },
+  { value: '0-50000', label: 'Hasta USD 50.000' },
+  { value: '50000-100000', label: 'USD 50.000 - 100.000' },
+  { value: '100000-200000', label: 'USD 100.000 - 200.000' },
+  { value: '200000-500000', label: 'USD 200.000 - 500.000' },
+  { value: '500000+', label: 'Más de USD 500.000' },
 ]
 
 export function HeroSection() {
@@ -40,178 +54,219 @@ export function HeroSection() {
   const [operation, setOperation] = useState('venta')
   const [propertyType, setPropertyType] = useState('todos')
   const [location, setLocation] = useState('todos')
+  const [priceRange, setPriceRange] = useState('todos')
+  const [imageLoaded, setImageLoaded] = useState(false)
+
+  useEffect(() => {
+    const img = new Image()
+    img.src = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
+    img.onload = () => setImageLoaded(true)
+  }, [])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
     params.set('operacion', operation)
     if (propertyType !== 'todos') params.set('tipo', propertyType)
     if (location !== 'todos') params.set('zona', location)
+    if (priceRange !== 'todos') params.set('precio', priceRange)
     router.push(`/propiedades?${params.toString()}`)
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
+      {/* Background Image with Cinematic Zoom Effect */}
+      <motion.div
+        initial={{ scale: 1.1 }}
+        animate={{ scale: imageLoaded ? 1 : 1.1 }}
+        transition={{ duration: 8, ease: 'easeOut' }}
+        className="absolute inset-0 z-0"
+      >
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop')`,
           }}
         />
-        <div className="absolute inset-0 gradient-overlay" />
-        {/* Subtle pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-      </div>
+      </motion.div>
+
+      {/* Premium Dark Overlay - Clean, no patterns */}
+      <div 
+        className="absolute inset-0 z-[1]"
+        style={{
+          background: `linear-gradient(
+            to bottom,
+            rgba(10, 20, 40, 0.65) 0%,
+            rgba(15, 25, 50, 0.75) 50%,
+            rgba(10, 20, 45, 0.85) 100%
+          )`,
+        }}
+      />
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 pt-32 pb-20">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 mb-8 animate-fade-up">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm text-primary-foreground/90 font-medium">
-              Especialistas en Zona Oeste desde 1999
-            </span>
-          </div>
+      <div className="relative z-10 w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            {/* Text Content */}
+            <div className="text-center mb-12 md:mb-16">
+              {/* Main Heading */}
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-white leading-[1.1] mb-6 md:mb-8 tracking-tight text-balance"
+              >
+                Encontrá tu próxima propiedad con{' '}
+                <span className="text-[#4A90D9]">Alvarez Brokers</span>
+              </motion.h1>
 
-          {/* Main Heading */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold text-primary-foreground leading-tight mb-6 animate-fade-up text-balance" style={{ animationDelay: '0.1s' }}>
-            Tu próxima propiedad comienza con una{' '}
-            <span className="text-accent">decisión inteligente</span>
-          </h1>
+              {/* Subtitle */}
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-lg sm:text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed font-light"
+              >
+                Especialistas en El Palomar, Ciudad Jardín y Zona Oeste. 
+                Venta, alquiler y asesoramiento inmobiliario premium.
+              </motion.p>
+            </div>
 
-          {/* Subtitle */}
-          <p className="text-lg sm:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-12 animate-fade-up leading-relaxed" style={{ animationDelay: '0.2s' }}>
-            Encontrá el hogar de tus sueños en El Palomar, Ciudad Jardín y toda Zona Oeste 
-            con el respaldo de más de 25 años de experiencia inmobiliaria.
-          </p>
+            {/* Premium Search Box */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="w-full"
+            >
+              <div className="bg-white rounded-2xl shadow-2xl p-3 md:p-4 max-w-5xl mx-auto">
+                {/* Operation Tabs */}
+                <div className="flex gap-2 mb-4">
+                  {operationOptions.map((op) => (
+                    <button
+                      key={op.value}
+                      onClick={() => setOperation(op.value)}
+                      className={cn(
+                        'flex-1 sm:flex-none px-6 sm:px-8 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300',
+                        operation === op.value
+                          ? 'bg-[#0F2A4A] text-white shadow-lg'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      )}
+                    >
+                      {op.label}
+                    </button>
+                  ))}
+                </div>
 
-          {/* Search Box */}
-          <div className="animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-2xl p-2 max-w-4xl mx-auto border border-border/50">
-              {/* Operation Tabs */}
-              <div className="flex gap-1 p-1 mb-2">
-                {operationOptions.map((op) => (
-                  <button
-                    key={op.value}
-                    onClick={() => setOperation(op.value)}
-                    className={cn(
-                      'flex-1 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-200',
-                      operation === op.value
-                        ? 'bg-primary text-primary-foreground shadow-lg'
-                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-                    )}
+                {/* Search Fields Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                  {/* Property Type */}
+                  <div className="relative lg:col-span-1">
+                    <Select value={propertyType} onValueChange={setPropertyType}>
+                      <SelectTrigger className="h-14 pl-12 bg-gray-50 border-0 rounded-xl text-gray-800 hover:bg-gray-100 transition-colors">
+                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <SelectValue placeholder="Tipo de propiedad" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {propertyTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value} className="rounded-lg">
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Location */}
+                  <div className="relative lg:col-span-1">
+                    <Select value={location} onValueChange={setLocation}>
+                      <SelectTrigger className="h-14 pl-12 bg-gray-50 border-0 rounded-xl text-gray-800 hover:bg-gray-100 transition-colors">
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <SelectValue placeholder="Ubicación" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {locations.map((loc) => (
+                          <SelectItem key={loc.value} value={loc.value} className="rounded-lg">
+                            {loc.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Price Range */}
+                  <div className="relative lg:col-span-1">
+                    <Select value={priceRange} onValueChange={setPriceRange}>
+                      <SelectTrigger className="h-14 pl-12 bg-gray-50 border-0 rounded-xl text-gray-800 hover:bg-gray-100 transition-colors">
+                        <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <SelectValue placeholder="Precio" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {priceRanges.map((price) => (
+                          <SelectItem key={price.value} value={price.value} className="rounded-lg">
+                            {price.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Search Button - spans 2 columns on lg */}
+                  <Button
+                    onClick={handleSearch}
+                    size="lg"
+                    className="h-14 rounded-xl text-base font-semibold gap-3 bg-[#0F2A4A] hover:bg-[#1a3d66] text-white shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2"
                   >
-                    {op.label}
-                  </button>
-                ))}
+                    <Search className="w-5 h-5" />
+                    Buscar propiedades
+                  </Button>
+                </div>
               </div>
 
-              {/* Search Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-2">
-                {/* Property Type */}
-                <div className="relative">
-                  <Select value={propertyType} onValueChange={setPropertyType}>
-                    <SelectTrigger className="h-14 pl-12 bg-secondary/50 border-0 rounded-xl text-foreground">
-                      <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <SelectValue placeholder="Tipo de propiedad" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {propertyTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Location */}
-                <div className="relative">
-                  <Select value={location} onValueChange={setLocation}>
-                    <SelectTrigger className="h-14 pl-12 bg-secondary/50 border-0 rounded-xl text-foreground">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <SelectValue placeholder="Ubicación" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map((loc) => (
-                        <SelectItem key={loc.value} value={loc.value}>
-                          {loc.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Rooms */}
-                <div className="relative">
-                  <Select defaultValue="todos">
-                    <SelectTrigger className="h-14 pl-12 bg-secondary/50 border-0 rounded-xl text-foreground">
-                      <Bed className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <SelectValue placeholder="Ambientes" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todos">Todos</SelectItem>
-                      <SelectItem value="1">1 ambiente</SelectItem>
-                      <SelectItem value="2">2 ambientes</SelectItem>
-                      <SelectItem value="3">3 ambientes</SelectItem>
-                      <SelectItem value="4">4+ ambientes</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Search Button */}
-                <Button
-                  onClick={handleSearch}
-                  size="lg"
-                  className="h-14 rounded-xl text-base font-semibold gap-2"
-                >
-                  <Search className="w-5 h-5" />
-                  Buscar
-                </Button>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
-              <span className="text-primary-foreground/60 text-sm">Búsquedas populares:</span>
-              <Link 
-                href="/propiedades?operacion=venta&tipo=casa" 
-                className="text-sm text-primary-foreground/80 hover:text-primary-foreground underline underline-offset-4 transition-colors"
+              {/* Stats below search - subtle */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1 }}
+                className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-8 md:mt-10"
               >
-                Casas en venta
-              </Link>
-              <Link 
-                href="/propiedades?operacion=alquiler&tipo=departamento" 
-                className="text-sm text-primary-foreground/80 hover:text-primary-foreground underline underline-offset-4 transition-colors"
-              >
-                Departamentos en alquiler
-              </Link>
-              <Link 
-                href="/propiedades?zona=el-palomar" 
-                className="text-sm text-primary-foreground/80 hover:text-primary-foreground underline underline-offset-4 transition-colors"
-              >
-                El Palomar
-              </Link>
-            </div>
+                <div className="text-center">
+                  <p className="text-2xl sm:text-3xl font-bold text-white">+500</p>
+                  <p className="text-sm text-white/60">Propiedades</p>
+                </div>
+                <div className="w-px h-10 bg-white/20 hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-2xl sm:text-3xl font-bold text-white">+25</p>
+                  <p className="text-sm text-white/60">Años de experiencia</p>
+                </div>
+                <div className="w-px h-10 bg-white/20 hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-2xl sm:text-3xl font-bold text-white">+2000</p>
+                  <p className="text-sm text-white/60">Clientes satisfechos</p>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-primary-foreground/60 text-xs uppercase tracking-wider">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex flex-col items-center gap-2 cursor-pointer"
+            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+          >
+            <span className="text-white/50 text-xs uppercase tracking-[0.2em] font-medium">
               Descubrí más
             </span>
-            <ChevronDown className="w-6 h-6 text-primary-foreground/60" />
-          </div>
-        </div>
+            <ChevronDown className="w-5 h-5 text-white/50" />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )
