@@ -90,30 +90,30 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
   })
 
   const FilterContent = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Search */}
-      <div>
-        <Label className="text-sm font-medium mb-2 block">Buscar</Label>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Buscar</Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por título o ubicación..."
             value={filters.search}
             onChange={(e) => updateFilter('search', e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11 rounded-lg"
           />
         </div>
       </div>
 
       {/* Operation Type */}
-      <div>
-        <Label className="text-sm font-medium mb-2 block">Operación</Label>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Operación</Label>
         <div className="flex gap-2">
           <Button
             variant={filters.operation === 'todos' ? 'default' : 'outline'}
             size="sm"
             onClick={() => updateFilter('operation', 'todos')}
-            className="flex-1"
+            className="flex-1 h-10 rounded-lg text-xs sm:text-sm"
           >
             Todas
           </Button>
@@ -123,7 +123,7 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
               variant={filters.operation === op.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => updateFilter('operation', op.value)}
-              className="flex-1"
+              className="flex-1 h-10 rounded-lg text-xs sm:text-sm"
             >
               {op.label}
             </Button>
@@ -132,13 +132,13 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
       </div>
 
       {/* Property Type */}
-      <div>
-        <Label className="text-sm font-medium mb-2 block">Tipo de propiedad</Label>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Tipo de propiedad</Label>
         <Select value={filters.propertyType} onValueChange={(v) => updateFilter('propertyType', v)}>
-          <SelectTrigger>
+          <SelectTrigger className="h-11 rounded-lg">
             <SelectValue placeholder="Seleccionar tipo" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg">
             <SelectItem value="todos">Todos los tipos</SelectItem>
             {propertyTypes.map((type) => (
               <SelectItem key={type.value} value={type.value}>
@@ -150,13 +150,13 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
       </div>
 
       {/* Location */}
-      <div>
-        <Label className="text-sm font-medium mb-2 block">Ubicación</Label>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Ubicación</Label>
         <Select value={filters.neighborhood} onValueChange={(v) => updateFilter('neighborhood', v)}>
-          <SelectTrigger>
+          <SelectTrigger className="h-11 rounded-lg">
             <SelectValue placeholder="Seleccionar zona" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg">
             <SelectItem value="todos">Todas las zonas</SelectItem>
             {neighborhoods.map((n) => (
               <SelectItem key={n.value} value={n.value}>
@@ -168,14 +168,14 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
       </div>
 
       {/* Price Range */}
-      <div>
-        <Label className="text-sm font-medium mb-2 block">Rango de precio</Label>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Rango de precio</Label>
         <div className="flex items-center gap-2">
           <Select value={filters.currency} onValueChange={(v) => updateFilter('currency', v)}>
-            <SelectTrigger className="w-24">
+            <SelectTrigger className="w-20 h-11 rounded-lg text-xs">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-lg">
               <SelectItem value="USD">USD</SelectItem>
               <SelectItem value="ARS">ARS</SelectItem>
             </SelectContent>
@@ -185,65 +185,67 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
             placeholder="Mín"
             value={filters.priceMin}
             onChange={(e) => updateFilter('priceMin', e.target.value)}
-            className="flex-1"
+            className="flex-1 h-11 rounded-lg text-xs"
           />
-          <span className="text-muted-foreground">-</span>
+          <span className="text-muted-foreground text-sm">-</span>
           <Input
             type="number"
             placeholder="Máx"
             value={filters.priceMax}
             onChange={(e) => updateFilter('priceMax', e.target.value)}
-            className="flex-1"
+            className="flex-1 h-11 rounded-lg text-xs"
           />
         </div>
       </div>
 
       {/* Rooms */}
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <Label className="text-sm font-medium mb-2 block">Ambientes</Label>
-          <Select value={filters.rooms} onValueChange={(v) => updateFilter('rooms', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3</SelectItem>
-              <SelectItem value="4">4+</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-sm font-medium mb-2 block">Dormitorios</Label>
-          <Select value={filters.bedrooms} onValueChange={(v) => updateFilter('bedrooms', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3</SelectItem>
-              <SelectItem value="4">4+</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-sm font-medium mb-2 block">Baños</Label>
-          <Select value={filters.bathrooms} onValueChange={(v) => updateFilter('bathrooms', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3+</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Ambientes</Label>
+        <Select value={filters.rooms} onValueChange={(v) => updateFilter('rooms', v)}>
+          <SelectTrigger className="h-11 rounded-lg">
+            <SelectValue placeholder="Todos" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg">
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="1">1</SelectItem>
+            <SelectItem value="2">2</SelectItem>
+            <SelectItem value="3">3</SelectItem>
+            <SelectItem value="4">4+</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Bedrooms */}
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Dormitorios</Label>
+        <Select value={filters.bedrooms} onValueChange={(v) => updateFilter('bedrooms', v)}>
+          <SelectTrigger className="h-11 rounded-lg">
+            <SelectValue placeholder="Todos" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg">
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="1">1</SelectItem>
+            <SelectItem value="2">2</SelectItem>
+            <SelectItem value="3">3</SelectItem>
+            <SelectItem value="4">4+</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Bathrooms */}
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold text-foreground block">Baños</Label>
+        <Select value={filters.bathrooms} onValueChange={(v) => updateFilter('bathrooms', v)}>
+          <SelectTrigger className="h-11 rounded-lg">
+            <SelectValue placeholder="Todos" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg">
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="1">1</SelectItem>
+            <SelectItem value="2">2</SelectItem>
+            <SelectItem value="3">3+</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Advanced Filters */}
@@ -278,7 +280,7 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
 
       {/* Clear Filters */}
       {hasActiveFilters && (
-        <Button variant="outline" className="w-full" onClick={clearFilters}>
+        <Button variant="outline" className="w-full h-11 rounded-lg mt-4" onClick={clearFilters}>
           <X className="w-4 h-4 mr-2" />
           Limpiar filtros
         </Button>
@@ -289,12 +291,12 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
   return (
     <>
       {/* Desktop Filters */}
-      <aside className="hidden lg:block w-80 shrink-0">
-        <div className="sticky top-24 bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
+      <aside className="hidden lg:block w-72 shrink-0">
+        <div className="sticky top-24 bg-card rounded-xl border border-border/50 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-foreground">Filtros</h2>
-            <span className="text-sm text-muted-foreground">
-              {resultsCount} resultados
+            <h2 className="text-base font-semibold text-foreground">Filtros</h2>
+            <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+              {resultsCount}
             </span>
           </div>
           <FilterContent />
@@ -305,11 +307,11 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
       <div className="lg:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" className="w-full gap-2">
+            <Button variant="outline" className="w-full gap-2 h-11 rounded-lg">
               <SlidersHorizontal className="w-4 h-4" />
               Filtros
               {hasActiveFilters && (
-                <span className="ml-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                <span className="ml-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
                   !
                 </span>
               )}
@@ -322,7 +324,7 @@ export function PropertyFilters({ filters, onFilterChange, resultsCount }: Prope
             <FilterContent />
             <div className="mt-6">
               <SheetClose asChild>
-                <Button className="w-full">
+                <Button className="w-full h-11 rounded-lg">
                   Ver {resultsCount} resultados
                 </Button>
               </SheetClose>
