@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Search, MapPin, ChevronDown, Building2, DollarSign } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import {
@@ -66,22 +67,24 @@ export function HeroSection() {
   }
 
   return (
-    <section className="relative h-screen min-h-[600px] sm:min-h-[750px] flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Background Image - Optimized for mobile with lazy loading */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-auto"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop')`,
-          backgroundAttachment: 'fixed',
-          backgroundPosition: 'center',
-        }}
+    <section className="relative h-screen min-h-[600px] sm:min-h-[750px] flex items-center justify-center overflow-hidden bg-[#0c1e36]">
+      {/* Background Image - next/image with priority for instant LCP */}
+      <Image
+        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=75&w=1280&auto=format&fit=crop"
+        alt=""
+        fill
+        priority
+        fetchPriority="high"
+        sizes="100vw"
+        className="object-cover object-center"
+        quality={75}
       />
 
-      {/* Dark Overlay - Cleaner and faster */}
-      <div 
+      {/* Dark Overlay */}
+      <div
         className="absolute inset-0 z-[1]"
         style={{
-          background: `linear-gradient(135deg, rgba(15, 42, 74, 0.7) 0%, rgba(20, 35, 60, 0.8) 50%, rgba(10, 25, 50, 0.85) 100%)`,
+          background: `linear-gradient(135deg, rgba(15, 42, 74, 0.72) 0%, rgba(20, 35, 60, 0.82) 50%, rgba(10, 25, 50, 0.88) 100%)`,
         }}
       />
 
