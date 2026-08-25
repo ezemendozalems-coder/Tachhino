@@ -3,7 +3,7 @@ export interface Property {
   slug: string
   title: string
   operationType: 'venta' | 'alquiler' | 'temporal'
-  propertyType: 'casa' | 'departamento' | 'ph' | 'lote' | 'oficina' | 'local' | 'cochera' | 'galpon'
+  propertyType: 'casa' | 'departamento' | 'duplex' | 'ph' | 'lote' | 'oficina' | 'local' | 'cochera' | 'galpon'
   address: string
   neighborhood: string
   city: string
@@ -23,6 +23,8 @@ export interface Property {
   images: string[]
   featured: boolean
   creditReady: boolean
+  reserved: boolean
+  isNew: boolean
   location?: {
     lat: number
     lng: number
@@ -53,7 +55,7 @@ export interface Zone {
   name: string
   description: string
   image: string
-  propertyCount: number
+  href: string
 }
 
 export interface Stat {

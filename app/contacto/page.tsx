@@ -1,16 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
+import {
+  MapPin,
+  Phone,
+  Mail,
   Clock,
   MessageCircle,
   Home,
   FileText,
-  TrendingUp,
+  Key,
   Search,
   CheckCircle2,
   ArrowRight,
@@ -29,24 +28,29 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 
+// Placeholders — reemplazar por los datos reales de contacto de Tacchino Propiedades.
+const PHONE_NUMBER = '+54 11 4451-0000'
+const EMAIL = 'info@tacchinopropiedades.com.ar'
+const WHATSAPP_URL = 'https://wa.me/5491144510000?text=Hola%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n%20sobre...'
+
 const contactInfo = [
   {
     icon: MapPin,
-    label: 'Dirección',
-    value: 'Marconi 680, El Palomar, Buenos Aires',
-    href: 'https://maps.google.com/?q=Marconi+680+El+Palomar+Buenos+Aires',
+    label: 'Zona de atención',
+    value: 'Ciudad Jardín, El Palomar y Zona Oeste, Buenos Aires',
+    href: null,
   },
   {
     icon: Phone,
     label: 'Teléfono',
-    value: '+54 11 1234-5678',
-    href: 'tel:+5491112345678',
+    value: PHONE_NUMBER,
+    href: `tel:${PHONE_NUMBER.replace(/[^+\d]/g, '')}`,
   },
   {
     icon: Mail,
     label: 'Email',
-    value: 'info@alvarezbrokers.com.ar',
-    href: 'mailto:info@alvarezbrokers.com.ar',
+    value: EMAIL,
+    href: `mailto:${EMAIL}`,
   },
   {
     icon: Clock,
@@ -57,30 +61,10 @@ const contactInfo = [
 ]
 
 const quickOptions = [
-  {
-    icon: Home,
-    title: '¿Querés vender?',
-    description: 'Comercializamos tu propiedad',
-    value: 'vender',
-  },
-  {
-    icon: Search,
-    title: '¿Querés comprar?',
-    description: 'Encontramos tu hogar ideal',
-    value: 'comprar',
-  },
-  {
-    icon: FileText,
-    title: '¿Necesitás tasar?',
-    description: 'Valuación profesional',
-    value: 'tasar',
-  },
-  {
-    icon: TrendingUp,
-    title: '¿Buscás invertir?',
-    description: 'Oportunidades de inversión',
-    value: 'invertir',
-  },
+  { icon: Home, title: '¿Querés vender?', description: 'Comercializamos tu propiedad', value: 'vender' },
+  { icon: Search, title: '¿Querés comprar?', description: 'Encontramos tu hogar ideal', value: 'comprar' },
+  { icon: Key, title: '¿Buscás alquilar?', description: 'Propiedades seleccionadas', value: 'alquilar' },
+  { icon: FileText, title: '¿Necesitás tasar?', description: 'Valuación profesional', value: 'tasar' },
 ]
 
 const reasons = [
@@ -88,7 +72,6 @@ const reasons = [
   { value: 'comprar', label: 'Quiero comprar una propiedad' },
   { value: 'alquilar', label: 'Quiero alquilar una propiedad' },
   { value: 'tasar', label: 'Necesito una tasación' },
-  { value: 'invertir', label: 'Busco oportunidades de inversión' },
   { value: 'otro', label: 'Otro motivo' },
 ]
 
@@ -105,7 +88,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     setIsSubmitting(false)
     setIsSubmitted(true)
   }
@@ -113,18 +96,17 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        <div className="container mx-auto px-4 relative z-10">
+      <section className="relative pt-32 pb-16">
+        <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-sm font-semibold text-accent uppercase tracking-wider mb-3 block">
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider mb-3 block">
               Contacto
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-6 text-balance">
+            <h1 className="font-serif text-4xl sm:text-5xl text-foreground mb-6 text-balance">
               Estamos para ayudarte
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Cualquier consulta que tengas, nuestro equipo está disponible 
+              Cualquier consulta que tengas, nuestro equipo está disponible
               para brindarte el mejor asesoramiento inmobiliario.
             </p>
           </div>
@@ -140,16 +122,16 @@ export default function ContactPage() {
                 key={option.value}
                 onClick={() => handleQuickOption(option.value)}
                 className={cn(
-                  'flex flex-col items-center p-6 rounded-2xl border transition-all',
-                  'bg-card hover:bg-secondary hover:border-primary/30 hover:shadow-lg',
-                  selectedReason === option.value && 'border-primary bg-primary/5'
+                  'flex flex-col items-center p-6 rounded-lg border transition-all text-center',
+                  'bg-card hover:border-primary/40 hover:shadow-lg',
+                  selectedReason === option.value ? 'border-primary bg-primary/5' : 'border-border/60'
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                  <option.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center mb-3">
+                  <option.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">{option.title}</h3>
-                <p className="text-sm text-muted-foreground text-center">{option.description}</p>
+                <h3 className="font-medium text-foreground mb-1">{option.title}</h3>
+                <p className="text-sm text-muted-foreground">{option.description}</p>
               </button>
             ))}
           </div>
@@ -157,33 +139,30 @@ export default function ContactPage() {
       </section>
 
       {/* Main Content */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Info */}
             <div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground mb-6">
+              <h2 className="font-serif text-2xl sm:text-3xl text-foreground mb-6">
                 Información de contacto
               </h2>
               <p className="text-muted-foreground mb-8 leading-relaxed">
-                Visitanos en nuestra oficina de El Palomar o contactanos por cualquiera 
-                de los siguientes medios. Te responderemos a la brevedad.
+                Contactanos por cualquiera de los siguientes medios. Te
+                responderemos a la brevedad.
               </p>
 
-              {/* Contact Details */}
               <div className="space-y-4 mb-8">
                 {contactInfo.map((info) => (
                   <div key={info.label} className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center shrink-0">
                       <info.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <div className="text-sm text-muted-foreground">{info.label}</div>
                       {info.href ? (
-                        <a 
+                        <a
                           href={info.href}
-                          target={info.href.startsWith('http') ? '_blank' : undefined}
-                          rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                           className="text-foreground font-medium hover:text-primary transition-colors"
                         >
                           {info.value}
@@ -197,60 +176,47 @@ export default function ContactPage() {
               </div>
 
               {/* WhatsApp CTA */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+              <div className="bg-[var(--color-ink)] rounded-lg p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                    <MessageCircle className="w-6 h-6 text-white fill-white" />
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <MessageCircle className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-1">
+                    <h3 className="font-medium text-white mb-1">
                       ¿Preferís WhatsApp?
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-white/60">
                       Chateá con nosotros de forma instantánea
                     </p>
                   </div>
-                  <Button className="bg-emerald-500 hover:bg-emerald-600" asChild>
-                    <a 
-                      href="https://wa.me/5491112345678?text=Hola, me gustaría recibir información sobre..." 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                  <Button className="bg-primary hover:bg-primary/90 text-white rounded-sm" asChild>
+                    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
                       Chatear
                     </a>
                   </Button>
-                </div>
-              </div>
-
-              {/* Map */}
-              <div className="mt-8 aspect-video bg-secondary rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Mapa de ubicación</p>
-                  <p className="text-sm text-muted-foreground">Marconi 680, El Palomar</p>
                 </div>
               </div>
             </div>
 
             {/* Contact Form */}
             <div id="contact-form">
-              <div className="bg-card rounded-2xl border border-border/50 p-8 shadow-lg">
-                <h2 className="text-2xl font-serif font-bold text-foreground mb-6">
+              <div className="bg-card rounded-lg border border-border/60 p-8 shadow-sm">
+                <h2 className="font-serif text-2xl text-foreground mb-6">
                   Envianos tu consulta
                 </h2>
 
                 {isSubmitted ? (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                    <h3 className="text-xl font-medium text-foreground mb-2">
                       Mensaje enviado
                     </h3>
                     <p className="text-muted-foreground mb-6">
                       Gracias por contactarnos. Te responderemos a la brevedad.
                     </p>
-                    <Button variant="outline" onClick={() => setIsSubmitted(false)}>
+                    <Button variant="outline" className="rounded-sm" onClick={() => setIsSubmitted(false)}>
                       Enviar otra consulta
                     </Button>
                   </div>
@@ -259,46 +225,26 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="name">Nombre completo</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          required
-                          placeholder="Tu nombre"
-                          className="mt-1"
-                        />
+                        <Input id="name" name="name" required placeholder="Tu nombre" className="mt-1 rounded-sm" />
                       </div>
                       <div>
                         <Label htmlFor="phone">Teléfono</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          required
-                          placeholder="11 1234-5678"
-                          className="mt-1"
-                        />
+                        <Input id="phone" name="phone" type="tel" required placeholder="11 1234-5678" className="mt-1 rounded-sm" />
                       </div>
                     </div>
 
                     <div>
                       <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="tu@email.com"
-                        className="mt-1"
-                      />
+                      <Input id="email" name="email" type="email" required placeholder="tu@email.com" className="mt-1 rounded-sm" />
                     </div>
 
                     <div>
                       <Label htmlFor="reason">Motivo de consulta</Label>
                       <Select value={selectedReason} onValueChange={setSelectedReason}>
-                        <SelectTrigger className="mt-1">
+                        <SelectTrigger className="mt-1 rounded-sm">
                           <SelectValue placeholder="Seleccionar motivo" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-sm">
                           {reasons.map((reason) => (
                             <SelectItem key={reason.value} value={reason.value}>
                               {reason.label}
@@ -316,11 +262,11 @@ export default function ContactPage() {
                         rows={5}
                         required
                         placeholder="Contanos en qué podemos ayudarte..."
-                        className="mt-1 resize-none"
+                        className="mt-1 resize-none rounded-sm"
                       />
                     </div>
 
-                    <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                    <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-sm" size="lg" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
                           <Spinner className="mr-2" />

@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Phone, ChevronDown } from 'lucide-react'
+import { Menu, Phone, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TacchinoLogo } from '@/components/brand/tacchino-logo'
 import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -14,18 +15,22 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 
+const PHONE_NUMBER = '+54 11 4451-0000' // placeholder — reemplazar por el teléfono real
+
 const navigation = [
   { name: 'Inicio', href: '/' },
   { name: 'Propiedades', href: '/propiedades' },
-  { 
-    name: 'Servicios', 
-    href: '/servicios',
+  {
+    name: 'Operaciones',
+    href: '/propiedades',
     children: [
-      { name: 'Todos los Servicios', href: '/servicios' },
-      { name: 'Tasaciones', href: '/tasaciones' },
-      { name: 'Inversiones', href: '/inversiones' },
-    ]
+      { name: 'Comprar', href: '/comprar' },
+      { name: 'Alquilar', href: '/alquilar' },
+      { name: 'Apto crédito', href: '/apto-credito' },
+    ],
   },
+  { name: 'Tasaciones', href: '/tasaciones' },
+  { name: 'Servicios', href: '/servicios' },
   { name: 'Nosotros', href: '/nosotros' },
   { name: 'Contacto', href: '/contacto' },
 ]
@@ -34,7 +39,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
-  
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -48,30 +53,27 @@ export function Header() {
     return pathname.startsWith(href)
   }
 
+  // Solo el Home (y Tasaciones, que abre con un hero oscuro) tienen contenido
+  // oscuro pegado al header como para que el header transparente + texto
+  // blanco sea legible antes de scrollear. En el resto de las páginas el
+  // header arranca sólido para no perderse sobre fondo claro.
+  const hasDarkHeroAtTop = pathname === '/' || pathname === '/tasaciones'
+  const isSolid = isScrolled || !hasDarkHeroAtTop
+
   return (
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
-          ? 'bg-card/95 backdrop-blur-lg shadow-lg border-b border-border/50'
+        isSolid
+          ? 'bg-[var(--color-cream)]/95 backdrop-blur-lg shadow-sm border-b border-border/60'
           : 'bg-transparent'
       )}
     >
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className={cn(
-              "flex flex-col transition-colors duration-300",
-              isScrolled ? "text-foreground" : "text-primary-foreground"
-            )}>
-              <span className="text-xl font-serif font-bold tracking-tight">
-                ALVAREZ
-              </span>
-              <span className="text-xs tracking-[0.3em] uppercase -mt-1 opacity-80">
-                Brokers
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <TacchinoLogo theme={isSolid ? 'dark' : 'light'} />
           </Link>
 
           {/* Desktop Navigation */}
@@ -82,11 +84,11 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <button
                       className={cn(
-                        'flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-                        isScrolled
+                        'flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-sm transition-all duration-200',
+                        isSolid
                           ? 'text-foreground hover:bg-secondary'
-                          : 'text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary-foreground/10',
-                        isActive(item.href) && (isScrolled ? 'bg-secondary text-primary' : 'bg-primary-foreground/20')
+                          : 'text-white/90 hover:text-white hover:bg-white/10',
+                        isActive(item.href) && (isSolid ? 'bg-secondary text-primary' : 'bg-white/15')
                       )}
                     >
                       {item.name}
@@ -108,11 +110,11 @@ export function Header() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-                    isScrolled
+                    'px-4 py-2 text-sm font-medium rounded-sm transition-all duration-200',
+                    isSolid
                       ? 'text-foreground hover:bg-secondary'
-                      : 'text-primary-foreground/90 hover:text-primary-foreground hover:bg-primary-foreground/10',
-                    isActive(item.href) && (isScrolled ? 'bg-secondary text-primary' : 'bg-primary-foreground/20')
+                      : 'text-white/90 hover:text-white hover:bg-white/10',
+                    isActive(item.href) && (isSolid ? 'bg-secondary text-primary' : 'bg-white/15')
                   )}
                 >
                   {item.name}
@@ -128,28 +130,23 @@ export function Header() {
               size="sm"
               className={cn(
                 'gap-2 transition-colors duration-300',
-                isScrolled
+                isSolid
                   ? 'text-foreground hover:bg-secondary'
-                  : 'text-primary-foreground hover:bg-primary-foreground/10'
+                  : 'text-white hover:bg-white/10 hover:text-white'
               )}
               asChild
             >
-              <a href="tel:+5491112345678">
+              <a href={`tel:${PHONE_NUMBER.replace(/[^+\d]/g, '')}`}>
                 <Phone className="w-4 h-4" />
-                <span className="hidden xl:inline">11 1234-5678</span>
+                <span className="hidden xl:inline">{PHONE_NUMBER}</span>
               </a>
             </Button>
             <Button
               size="sm"
-              className={cn(
-                'transition-all duration-300',
-                isScrolled
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                  : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
-              )}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
               asChild
             >
-              <Link href="/tasaciones">Solicitar Tasación</Link>
+              <Link href="/tasaciones">Solicitar tasación</Link>
             </Button>
           </div>
 
@@ -161,9 +158,9 @@ export function Header() {
                 size="icon"
                 className={cn(
                   'transition-colors duration-300',
-                  isScrolled
+                  isSolid
                     ? 'text-foreground hover:bg-secondary'
-                    : 'text-primary-foreground hover:bg-primary-foreground/10'
+                    : 'text-white hover:bg-white/10 hover:text-white'
                 )}
               >
                 <Menu className="w-6 h-6" />
@@ -173,14 +170,7 @@ export function Header() {
             <SheetContent side="right" className="w-full sm:w-80 p-0">
               <SheetHeader className="p-6 border-b border-border">
                 <SheetTitle className="text-left">
-                  <div className="flex flex-col">
-                    <span className="text-xl font-serif font-bold tracking-tight text-primary">
-                      ALVAREZ
-                    </span>
-                    <span className="text-xs tracking-[0.3em] uppercase -mt-1 text-muted-foreground">
-                      Brokers
-                    </span>
-                  </div>
+                  <TacchinoLogo theme="dark" />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col p-6">
@@ -196,7 +186,7 @@ export function Header() {
                             <Link
                               href={child.href}
                               className={cn(
-                                'px-6 py-3 text-sm font-medium rounded-lg transition-colors',
+                                'px-6 py-3 text-sm font-medium rounded-sm transition-colors',
                                 'hover:bg-secondary',
                                 isActive(child.href) && 'bg-secondary text-primary'
                               )}
@@ -211,7 +201,7 @@ export function Header() {
                         <Link
                           href={item.href}
                           className={cn(
-                            'px-4 py-3 text-sm font-medium rounded-lg transition-colors',
+                            'px-4 py-3 text-sm font-medium rounded-sm transition-colors',
                             'hover:bg-secondary',
                             isActive(item.href) && 'bg-secondary text-primary'
                           )}
@@ -224,14 +214,14 @@ export function Header() {
                 </nav>
                 <div className="mt-8 pt-6 border-t border-border flex flex-col gap-3">
                   <Button variant="outline" className="w-full justify-start gap-2" asChild>
-                    <a href="tel:+5491112345678">
+                    <a href={`tel:${PHONE_NUMBER.replace(/[^+\d]/g, '')}`}>
                       <Phone className="w-4 h-4" />
-                      11 1234-5678
+                      {PHONE_NUMBER}
                     </a>
                   </Button>
                   <SheetClose asChild>
-                    <Button className="w-full" asChild>
-                      <Link href="/tasaciones">Solicitar Tasación</Link>
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" asChild>
+                      <Link href="/tasaciones">Solicitar tasación</Link>
                     </Button>
                   </SheetClose>
                 </div>

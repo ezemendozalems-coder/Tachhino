@@ -1,32 +1,38 @@
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
-import { 
-  MapPin, 
-  Bed, 
-  Bath, 
-  Maximize, 
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Maximize,
   Car,
   Calendar,
   Building2,
   Compass,
-  Share2,
-  Heart,
   ChevronLeft,
   CheckCircle2,
   Phone,
-  Mail,
   MessageCircle,
+  CalendarCheck,
+  ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { PropertyCard } from '@/components/properties/property-card'
 import { PropertyGallery } from '@/components/properties/property-gallery'
 import { PropertyContactForm } from '@/components/properties/property-contact-form'
+import { PropertyShareButton } from '@/components/properties/property-share-button'
+import { PropertyFavoriteButton } from '@/components/properties/property-favorite-button'
+import { PropertyStickyMobileCTA } from '@/components/properties/property-sticky-mobile-cta'
+import { RecentlyViewedTracker } from '@/components/properties/recently-viewed-tracker'
+import { RecentlyViewedSection } from '@/components/properties/recently-viewed-section'
+import { PropertyMap } from '@/components/properties/property-map'
 import { properties } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
+
+// Placeholder — reemplazar por el número real de WhatsApp de Tacchino Propiedades.
+const WHATSAPP_NUMBER = '5491144510000'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -34,17 +40,25 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const property = properties.find(p => p.slug === slug)
-  
+  const property = properties.find((p) => p.slug === slug)
+
   if (!property) {
-    return {
-      title: 'Propiedad no encontrada',
-    }
+    return { title: 'Propiedad no encontrada' }
   }
+
+  const url = `https://tacchinopropiedades.com.ar/propiedades/${property.slug}`
 
   return {
     title: property.title,
     description: property.shortDescription,
+    openGraph: {
+      title: property.title,
+      description: property.shortDescription,
+      url,
+      type: 'website',
+      images: property.images[0] ? [{ url: property.images[0] }] : undefined,
+    },
+    alternates: { canonical: url },
   }
 }
 
@@ -55,8 +69,9 @@ const operationLabels: Record<string, string> = {
 }
 
 const propertyTypeLabels: Record<string, string> = {
-  casa: 'Casa',
+  casa: 'Chalet',
   departamento: 'Departamento',
+  duplex: 'Dúplex',
   ph: 'PH',
   lote: 'Lote',
   oficina: 'Oficina',
@@ -95,7 +110,7 @@ const featureLabels: Record<string, string> = {
 
 export default async function PropertyDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const property = properties.find(p => p.slug === slug)
+  const property = properties.find((p) => p.slug === slug)
 
   if (!property) {
     notFound()
@@ -108,36 +123,88 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   }).format(property.price)
 
   const relatedProperties = properties
-    .filter(p => p.id !== property.id && p.neighborhood === property.neighborhood)
+    .filter((p) => p.id !== property.id && p.neighborhood === property.neighborhood)
     .slice(0, 3)
 
   const whatsappMessage = `Hola, me interesa la propiedad: ${property.title} (Código: ${property.propertyCode}). Me gustaría recibir más información.`
-  const whatsappUrl = `https://wa.me/5491112345678?text=${encodeURIComponent(whatsappMessage)}`
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
+
+  const visitMessage = `Hola, quiero coordinar una visita para la propiedad: ${property.title} (Código: ${property.propertyCode}).`
+  const visitUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(visitMessage)}`
+
+  const financingMessage = `Hola, quiero consultar por financiación / apto crédito para la propiedad: ${property.title} (Código: ${property.propertyCode}).`
+  const financingUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(financingMessage)}`
+
+  const indicators = [
+    { value: property.coveredArea || property.totalArea, label: 'm² Superficie', show: true },
+    { value: property.rooms, label: 'Ambientes', show: property.rooms > 0 },
+    { value: property.bedrooms, label: 'Dormitorios', show: property.bedrooms > 0 },
+    { value: property.bathrooms, label: 'Baños', show: property.bathrooms > 0 },
+    { value: property.garages, label: 'Cochera', show: property.garages > 0 },
+  ].filter((i) => i.show)
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: property.title,
+    description: property.shortDescription,
+    url: `https://tacchinopropiedades.com.ar/propiedades/${property.slug}`,
+    image: property.images,
+    datePosted: property.createdAt,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: property.address,
+      addressLocality: property.neighborhood,
+      addressRegion: 'Buenos Aires',
+      addressCountry: 'AR',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: property.price,
+      priceCurrency: property.currency,
+      availability: property.reserved
+        ? 'https://schema.org/Reserved'
+        : 'https://schema.org/InStock',
+    },
+  }
 
   return (
-    <div className="min-h-screen bg-background pt-20">
+    <div className="min-h-screen bg-background pt-20 pb-24 lg:pb-0">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <RecentlyViewedTracker propertyId={property.id} />
+
       {/* Breadcrumb */}
-      <div className="bg-secondary/30 py-4">
+      <div className="bg-secondary/40 py-4">
         <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm">
+          <nav className="flex items-center gap-2 text-sm flex-wrap">
             <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
               Inicio
             </Link>
             <span className="text-muted-foreground">/</span>
-            <Link href="/propiedades" className="text-muted-foreground hover:text-foreground transition-colors">
-              Propiedades
+            <Link
+              href={`/propiedades?operacion=${property.operationType}`}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {operationLabels[property.operationType]}
             </Link>
             <span className="text-muted-foreground">/</span>
-            <span className="text-foreground font-medium truncate">{property.title}</span>
-          </div>
+            <span className="text-muted-foreground">{property.neighborhood}</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-foreground font-medium">
+              {propertyTypeLabels[property.propertyType]}
+            </span>
+          </nav>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Link 
+        <Link
           href="/propiedades"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 text-sm"
         >
           <ChevronLeft className="w-4 h-4" />
           Volver a propiedades
@@ -147,105 +214,90 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-8">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <Badge className={cn(
-                'text-sm',
-                property.operationType === 'venta' && 'bg-primary text-primary-foreground',
-                property.operationType === 'alquiler' && 'bg-accent text-accent-foreground'
-              )}>
+              <span
+                className={cn(
+                  'px-2.5 py-1 text-xs font-semibold uppercase tracking-wide rounded-sm',
+                  property.operationType === 'venta' ? 'bg-[var(--color-ink)] text-white' : 'bg-secondary text-foreground'
+                )}
+              >
                 {operationLabels[property.operationType]}
-              </Badge>
-              <Badge variant="secondary">
-                {propertyTypeLabels[property.propertyType]}
-              </Badge>
-              {property.featured && (
-                <Badge className="bg-amber-500 text-white">Destacada</Badge>
-              )}
+              </span>
               {property.creditReady && (
-                <Badge className="bg-emerald-500 text-white">Apto Crédito</Badge>
+                <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wide rounded-sm bg-primary text-white">
+                  ✓ Apto crédito
+                </span>
+              )}
+              {property.reserved && (
+                <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wide rounded-sm bg-secondary text-foreground border border-border">
+                  Reservada
+                </span>
+              )}
+              {property.isNew && (
+                <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wide rounded-sm bg-[var(--color-gold)] text-[var(--color-ink)]">
+                  Nueva
+                </span>
               )}
               <span className="text-sm text-muted-foreground">
                 Código: {property.propertyCode}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-2">
+            <h1 className="font-serif text-3xl sm:text-4xl text-foreground mb-2">
               {property.title}
             </h1>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-5 h-5" />
+              <MapPin className="w-4 h-4" />
               <span>{property.address}, {property.neighborhood}, {property.city}</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground">
+              <div className="text-3xl sm:text-4xl font-semibold text-foreground">
                 {formattedPrice}
               </div>
               {property.operationType === 'alquiler' && (
-                <span className="text-muted-foreground">/mes</span>
+                <span className="text-muted-foreground text-sm">/mes</span>
               )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Heart className="w-5 h-5" />
-                <span className="sr-only">Guardar</span>
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Share2 className="w-5 h-5" />
-                <span className="sr-only">Compartir</span>
-              </Button>
+              <PropertyFavoriteButton propertyId={property.id} />
+              <PropertyShareButton title={property.title} />
             </div>
           </div>
         </div>
 
+        {property.reserved && (
+          <div className="mb-6 px-4 py-3 rounded-sm bg-secondary border border-border text-sm text-muted-foreground">
+            Esta propiedad se encuentra <strong className="text-foreground">reservada</strong> actualmente.
+            Podés consultarnos por propiedades similares.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Gallery */}
             <PropertyGallery property={property} />
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {property.coveredArea > 0 && (
-                <div className="bg-card rounded-xl p-4 border border-border/50 text-center">
-                  <Maximize className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-lg font-semibold text-foreground">{property.coveredArea} m²</div>
-                  <div className="text-sm text-muted-foreground">Cubiertos</div>
+            {/* Indicadores */}
+            <div className={cn('grid gap-4', indicators.length >= 4 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4')}>
+              {indicators.map((indicator) => (
+                <div key={indicator.label} className="bg-card rounded-lg p-4 border border-border/60 text-center">
+                  <div className="text-2xl font-serif text-foreground">{indicator.value}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{indicator.label}</div>
                 </div>
-              )}
-              {property.totalArea > 0 && (
-                <div className="bg-card rounded-xl p-4 border border-border/50 text-center">
-                  <Maximize className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-lg font-semibold text-foreground">{property.totalArea} m²</div>
-                  <div className="text-sm text-muted-foreground">Totales</div>
-                </div>
-              )}
-              {property.bedrooms > 0 && (
-                <div className="bg-card rounded-xl p-4 border border-border/50 text-center">
-                  <Bed className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-lg font-semibold text-foreground">{property.bedrooms}</div>
-                  <div className="text-sm text-muted-foreground">Dormitorios</div>
-                </div>
-              )}
-              {property.bathrooms > 0 && (
-                <div className="bg-card rounded-xl p-4 border border-border/50 text-center">
-                  <Bath className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-lg font-semibold text-foreground">{property.bathrooms}</div>
-                  <div className="text-sm text-muted-foreground">Baños</div>
-                </div>
-              )}
+              ))}
             </div>
 
             {/* Description */}
-            <div className="bg-card rounded-2xl p-6 border border-border/50">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Descripción</h2>
+            <div className="bg-card rounded-lg p-6 border border-border/60">
+              <h2 className="text-xl font-medium text-foreground mb-4">Sobre esta propiedad</h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                 {property.longDescription}
               </p>
             </div>
 
             {/* Details */}
-            <div className="bg-card rounded-2xl p-6 border border-border/50">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Detalles</h2>
+            <div className="bg-card rounded-lg p-6 border border-border/60">
+              <h2 className="text-xl font-medium text-foreground mb-4">Detalles</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-muted-foreground" />
@@ -295,13 +347,13 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
             {/* Features */}
             {property.features.length > 0 && (
-              <div className="bg-card rounded-2xl p-6 border border-border/50">
-                <h2 className="text-xl font-semibold text-foreground mb-4">Características</h2>
+              <div className="bg-card rounded-lg p-6 border border-border/60">
+                <h2 className="text-xl font-medium text-foreground mb-4">Características</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {property.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-accent" />
-                      <span className="text-foreground">{featureLabels[feature] || feature}</span>
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                      <span className="text-foreground text-sm">{featureLabels[feature] || feature}</span>
                     </div>
                   ))}
                 </div>
@@ -309,50 +361,56 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             )}
 
             {/* Location */}
-            <div className="bg-card rounded-2xl p-6 border border-border/50">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Ubicación</h2>
-              <div className="aspect-video bg-secondary rounded-xl flex items-center justify-center mb-4">
-                <div className="text-center">
-                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Mapa de ubicación</p>
-                  <p className="text-sm text-muted-foreground">{property.neighborhood}, {property.city}</p>
-                </div>
+            <div className="bg-card rounded-lg p-6 border border-border/60">
+              <h2 className="text-xl font-medium text-foreground mb-4">Ubicación</h2>
+              <div className="aspect-video rounded-lg overflow-hidden mb-4">
+                <PropertyMap properties={[property]} activeId={property.id} />
               </div>
               <p className="text-muted-foreground">
-                Excelente ubicación en {property.neighborhood}, con fácil acceso a transporte público, 
-                comercios, colegios y todos los servicios. Zona residencial consolidada con calles 
-                tranquilas y arboladas.
+                Excelente ubicación en {property.neighborhood}, con fácil acceso a transporte
+                público, comercios y los principales accesos de la zona.
               </p>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Contact Card */}
-            <div className="bg-card rounded-2xl p-6 border border-border/50 sticky top-24">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                ¿Te interesa esta propiedad?
+            <div className="bg-card rounded-lg p-6 border border-border/60 lg:sticky lg:top-24">
+              <div className="mb-4">
+                <div className="text-2xl font-semibold text-foreground">{formattedPrice}</div>
+                {property.operationType === 'alquiler' && (
+                  <span className="text-muted-foreground text-sm">/mes</span>
+                )}
+              </div>
+              <h3 className="text-base font-medium text-foreground mb-4">
+                Quiero conocer esta propiedad
               </h3>
-              
-              {/* Quick Contact Buttons */}
+
               <div className="space-y-3 mb-6">
-                <Button className="w-full gap-2" size="lg" asChild>
+                <Button className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-sm" size="lg" asChild>
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="w-5 h-5" />
                     Consultar por WhatsApp
                   </a>
                 </Button>
-                <Button variant="outline" className="w-full gap-2" size="lg" asChild>
-                  <a href="tel:+5491112345678">
-                    <Phone className="w-5 h-5" />
-                    Llamar ahora
+                <Button variant="outline" className="w-full gap-2 rounded-sm" size="lg" asChild>
+                  <a href={visitUrl} target="_blank" rel="noopener noreferrer">
+                    <CalendarCheck className="w-5 h-5" />
+                    Coordinar una visita
                   </a>
                 </Button>
+                {property.creditReady && (
+                  <Button variant="outline" className="w-full gap-2 rounded-sm" size="lg" asChild>
+                    <a href={financingUrl} target="_blank" rel="noopener noreferrer">
+                      <ShieldCheck className="w-5 h-5" />
+                      Consultar financiación
+                    </a>
+                  </Button>
+                )}
               </div>
 
               <Separator className="my-6" />
 
-              {/* Contact Form */}
               <PropertyContactForm propertyCode={property.propertyCode} propertyTitle={property.title} />
             </div>
           </div>
@@ -361,7 +419,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         {/* Related Properties */}
         {relatedProperties.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-2xl font-serif font-bold text-foreground mb-8">
+            <h2 className="font-serif text-2xl text-foreground mb-8">
               Propiedades similares
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -371,7 +429,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             </div>
           </section>
         )}
+
+        <RecentlyViewedSection excludeId={property.id} />
       </div>
+
+      <PropertyStickyMobileCTA
+        formattedPrice={formattedPrice}
+        isRental={property.operationType === 'alquiler'}
+        whatsappUrl={whatsappUrl}
+      />
     </div>
   )
 }

@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,24 +5,20 @@ import { PropertyCard } from '@/components/properties/property-card'
 import { properties } from '@/lib/data'
 
 export function FeaturedProperties() {
-  const featuredProperties = properties.filter(p => p.featured).slice(0, 6)
+  const featuredProperties = properties.filter((p) => p.featured).slice(0, 6)
 
   return (
-    <section className="py-24 bg-background">
+    <section className="pt-20 sm:pt-24 pb-24 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
           <div className="max-w-2xl">
-            <span className="text-sm font-semibold text-accent uppercase tracking-wider mb-3 block">
-              Propiedades Destacadas
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider mb-3 block">
+              Propiedades destacadas
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-4 text-balance">
-              Encontrá tu próximo hogar
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-foreground mb-4 text-balance">
+              Una selección de oportunidades para encontrar tu próximo lugar.
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Selección exclusiva de propiedades en las mejores ubicaciones de Zona Oeste, 
-              El Palomar y Ciudad Jardín.
-            </p>
           </div>
           <Button variant="outline" size="lg" className="shrink-0 gap-2 group" asChild>
             <Link href="/propiedades">
@@ -35,10 +29,10 @@ export function FeaturedProperties() {
         </div>
 
         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {featuredProperties.map((property, index) => (
-            <div 
-              key={property.id} 
+            <div
+              key={property.id}
               className="animate-fade-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >

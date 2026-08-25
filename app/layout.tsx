@@ -1,39 +1,43 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Inter, DM_Serif_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { WhatsAppButton } from '@/components/layout/whatsapp-button'
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav'
+import { Preloader } from '@/components/layout/preloader'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 })
 
-const playfair = Playfair_Display({ 
+const dmSerifDisplay = DM_Serif_Display({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: '400',
+  variable: '--font-serif-display',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
   title: {
-    default: 'Alvarez Brokers | Inmobiliaria Premium en Zona Oeste',
-    template: '%s | Alvarez Brokers',
+    default: 'Tacchino Propiedades | Más de 40 años en Zona Oeste',
+    template: '%s | Tacchino Propiedades',
   },
-  description: 'J. I. Alvarez Brokers Inmobiliarios - Especialistas en comercialización de inmuebles, tasaciones profesionales y asesoramiento legal en El Palomar, Ciudad Jardín y Zona Oeste. Más de 25 años de experiencia.',
-  keywords: ['inmobiliaria', 'el palomar', 'ciudad jardín', 'zona oeste', 'propiedades', 'casas', 'departamentos', 'tasaciones', 'buenos aires'],
-  authors: [{ name: 'Alvarez Brokers' }],
-  creator: 'Alvarez Brokers',
+  description: 'Tacchino Propiedades — más de 40 años de experiencia en venta, alquiler, tasaciones y asesoramiento inmobiliario en Ciudad Jardín, El Palomar y Zona Oeste.',
+  keywords: ['inmobiliaria', 'tacchino propiedades', 'ciudad jardín', 'el palomar', 'zona oeste', 'propiedades', 'casas', 'departamentos', 'tasaciones', 'apto crédito', 'buenos aires'],
+  authors: [{ name: 'Tacchino Propiedades' }],
+  creator: 'Tacchino Propiedades',
   openGraph: {
     type: 'website',
     locale: 'es_AR',
-    url: 'https://alvarezbrokers.com.ar',
-    siteName: 'Alvarez Brokers',
-    title: 'Alvarez Brokers | Inmobiliaria Premium en Zona Oeste',
-    description: 'Especialistas en comercialización de inmuebles, tasaciones profesionales y asesoramiento legal en El Palomar, Ciudad Jardín y Zona Oeste.',
+    url: 'https://tacchinopropiedades.com.ar',
+    siteName: 'Tacchino Propiedades',
+    title: 'Tacchino Propiedades | Más de 40 años en Zona Oeste',
+    description: 'Más de 40 años de experiencia en venta, alquiler, tasaciones y asesoramiento inmobiliario en Ciudad Jardín, El Palomar y Zona Oeste.',
   },
   icons: {
     icon: [
@@ -55,7 +59,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1e3a5f',
+  themeColor: '#0B0D0F',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -67,14 +71,36 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="es" className={`${inter.variable} ${dmSerifDisplay.variable}`}>
       <body className="font-sans antialiased min-h-screen flex flex-col">
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'RealEstateAgent',
+              name: 'Tacchino Propiedades',
+              description: 'Más de 40 años de experiencia en venta, alquiler, tasaciones y asesoramiento inmobiliario en Ciudad Jardín, El Palomar y Zona Oeste.',
+              url: 'https://tacchinopropiedades.com.ar',
+              areaServed: ['Ciudad Jardín', 'El Palomar', 'Caseros', 'Villa Bosch', 'Martín Coronado', 'Hurlingham', 'San Martín'],
+              address: {
+                '@type': 'PostalAddress',
+                addressRegion: 'Buenos Aires',
+                addressCountry: 'AR',
+              },
+            }),
+          }}
+        />
+        <Preloader />
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 pb-16 lg:pb-0">
           {children}
         </main>
         <Footer />
         <WhatsAppButton />
+        <MobileBottomNav />
+        <Toaster position="top-center" />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

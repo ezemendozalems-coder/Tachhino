@@ -70,20 +70,20 @@ export default function NotFound() {
             ¿Necesitás ayuda? Contactanos:
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm">
-            <a 
-              href="https://wa.me/5491112345678" 
+            <a
+              href="https://wa.me/5491144510000"
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              WhatsApp: +54 9 11 1234-5678
+              WhatsApp: +54 11 4451-0000
             </a>
             <span className="hidden sm:inline text-muted-foreground">|</span>
-            <a 
-              href="mailto:info@alvarezbrokers.com" 
+            <a
+              href="mailto:info@tacchinopropiedades.com.ar"
               className="text-primary hover:underline"
             >
-              info@alvarezbrokers.com
+              info@tacchinopropiedades.com.ar
             </a>
           </div>
         </motion.div>
